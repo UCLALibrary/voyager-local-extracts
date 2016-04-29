@@ -1,0 +1,5 @@
+# Ignore marc records and generic output from queries and scripts
+*.mrc
+*.log
+*.out
+

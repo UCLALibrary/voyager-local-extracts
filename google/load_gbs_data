@@ -1,0 +1,37 @@
+#!/bin/sh
+
+echo "2013-05-21: Done with UCLA files; SRLF files so far are .gz and have no location column"
+exit 1
+
+# Get Voyager and Oracle environments
+BIN=/usr/local/bin
+. ${BIN}/vger_getenv
+
+# Must have filename
+if [ -z "$1" ]; then
+  echo $0 googlefile.tar.gz
+  exit 1
+fi
+
+# Try to confirm file is .tar.gz
+FILE=$1
+BASE=`basename ${FILE} .tar.gz`
+if [ ${FILE} = ${BASE} ]; then
+  echo ${FILE} is not a .tar.gz file
+  exit 1
+fi
+
+# Unpack the file
+gzcat ${FILE} | tar xvf -
+
+# Should be multiple text files with names starting with $BASE
+BIGFILE=${BASE}.all
+cat ${BASE}*.txt > ${BIGFILE}
+
+# If there's anything in BIGFILE, load it into Oracle
+if [ -s ${BIGFILE} ]; then
+  ${BIN}/vger_sqlldr_load vger_report ${BIGFILE} gbs_candidates.ctl
+fi
+
+# Clean up
+rm ${BASE}*.txt ${BIGFILE}

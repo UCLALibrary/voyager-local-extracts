@@ -1,0 +1,6 @@
+#!/bin/sh
+
+vger_sqlplus_run vger_report west_hols.sql
+
+/m1/voyager/ucladb/sbin/Pmarcexport -rH -mM -twest_hols.sql.out -owest_hols.mrc
+

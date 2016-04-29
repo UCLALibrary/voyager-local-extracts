@@ -1,0 +1,24 @@
+#!/bin/sh
+
+vger_sqlplus_run vger_report clu_bibs.sql
+/m1/voyager/ucladb/sbin/Pmarcexport -rB -mM -tclu_bibs.sql.out -oclu_bibs.mrc
+
+vger_sqlplus_run vger_report zas_bibs.sql
+/m1/voyager/ucladb/sbin/Pmarcexport -rB -mM -tzas_bibs.sql.out -ozas_bibs.mrc
+
+vger_sqlplus_run vger_report clu_hols.sql
+/m1/voyager/ucladb/sbin/Pmarcexport -rH -mM -tclu_hols.sql.out -oclu_hols.mrc
+
+vger_sqlplus_run vger_report zas_hols.sql
+/m1/voyager/ucladb/sbin/Pmarcexport -rH -mM -tzas_hols.sql.out -ozas_hols.mrc
+
+# Lists of record ids from the queries - no longer needed
+rm *.sql.out
+
+# Count the MARC records in each file
+for FILE in *.mrc; do marcsplit -c ${FILE}; done
+
+# Files larger than 100,000 records may need to be split for CDL/WEST
+# Generic: marcsplit -s 100000 input_file output_file_base
+# Run marcsplit -? for more info
+# Rename split files as requested by CDL
