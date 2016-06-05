@@ -9,7 +9,7 @@ use UCLA_Batch; #for UCLA_Batch::safenext to better handle data errors
 # set up db connection to ucladb
 my $username = "ucla_preaddb";
 # Requires these supporting files...
-my $password = `/opt/local/bin/get_value.pl /opt/local/bin/vger_db_credentials $username`;
+my $password = `/usr/local/bin/get_value.pl /opt/local/bin/vger_db_credentials $username`;
 my $dsn = "dbi:Oracle:host=localhost;sid=VGER";
 my $dbh = DBI->connect($dsn, $username, $password) or die DBI->errstr;
 
