@@ -23,7 +23,7 @@ echo Creating archives...
 zip -9 srlf_hathi_$DATE.zip srlf*.tsv
 zip -9 ucla_hathi_$DATE.zip ucla*.tsv
 
-echo If all OK, upload zip files to ftp.library.ucla.edu:/incoming/voyager/
+echo If all OK, upload zip files to box.com
 echo and notify Hathi and CDL.
 echo See https://docs.library.ucla.edu/x/SJmqBw
 
