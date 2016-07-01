@@ -1,18 +1,20 @@
 #!/bin/sh
 
+# Get voyager environment, for vars and for cron
+. `echo $HOME | sed "s/$LOGNAME/voyager/"`/.profile.local
+
 DATE=`date "+%Y%m%d"` #YYYYMMDD
 SCHEMA=vger_report
-BIN=/opt/local/bin
 
 echo Creating supporting tables: create_tmp_clu_export_tables.sql...
-$BIN/vger_sqlplus_run $SCHEMA create_tmp_clu_export_tables.sql
+${VGER_SCRIPT}/vger_sqlplus_run $SCHEMA create_tmp_clu_export_tables.sql
 
 echo Creating supporting tables: create_tmp_hathi_base_table.sql...
-$BIN/vger_sqlplus_run $SCHEMA create_tmp_hathi_base_table.sql
+${VGER_SCRIPT}/vger_sqlplus_run $SCHEMA create_tmp_hathi_base_table.sql
 
 for FILE in srlf*.sql ucla*.sql; do
   echo Running $FILE...
-  $BIN/vger_sqlplus_run vger_report $FILE
+  ${VGER_SCRIPT}/vger_sqlplus_run vger_report $FILE
   mv $FILE.out `basename $FILE.out .sql.out`_$DATE.tsv
 done
 
@@ -28,4 +30,4 @@ echo and notify Hathi and CDL.
 echo See https://docs.library.ucla.edu/x/SJmqBw
 
 echo Dropping supporting tables...
-$BIN/vger_sqlplus_run $SCHEMA drop_tmp_hathi_tables.sql
+${VGER_SCRIPT}/vger_sqlplus_run $SCHEMA drop_tmp_hathi_tables.sql
