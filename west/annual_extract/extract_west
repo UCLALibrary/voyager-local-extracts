@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Create working table with data for queries/extracts below
+vger_sqlplus_run vger_report create_tmp_west_serials.sql
+
+# Generate 4 files: CLU bibs/holdings, ZAS bibs/holdings
 vger_sqlplus_run vger_report clu_bibs.sql
 /m1/voyager/ucladb/sbin/Pmarcexport -rB -mM -tclu_bibs.sql.out -oclu_bibs.mrc
 
@@ -15,10 +19,31 @@ vger_sqlplus_run vger_report zas_hols.sql
 # Lists of record ids from the queries - no longer needed
 rm *.sql.out
 
-# Count the MARC records in each file
-for FILE in *.mrc; do marcsplit -c ${FILE}; done
+# Rename files per basic CDL requirements; will add extension later, after possible splits due to size
+TODAY=`date "+%Y%m%d"`    # YYYYMMDD
+mv clu_bibs.mrc CLU.voyager.bib.${TODAY}
+mv clu_hols.mrc CLU.voyager.holdings.${TODAY}
+mv zas_bibs.mrc ZAS.voyager.bib.${TODAY}
+mv zas_hols.mrc ZAS.voyager.holdings.${TODAY}
 
-# Files larger than 100,000 records may need to be split for CDL/WEST
-# Generic: marcsplit -s 100000 input_file output_file_base
-# Run marcsplit -? for more info
-# Rename split files as requested by CDL
+# Split large files, if needed, into files of max 100,000 recordsA
+for FILE in *.voyager.*.${TODAY}; do
+  COUNT=`marcsplit -c ${FILE} | awk '{print $3}'`
+  echo "Splitting ${FILE} (if needed)..."
+  if [ ${COUNT} -gt 100000 ]; then
+    marcsplit -s 100000 ${FILE} ${FILE} # creates file.001, file.002 etc
+    # Hard-coding since very unlikely to ever be more than 2 files after split
+    mv ${FILE}.001 ${FILE}.a
+    mv ${FILE}.002 ${FILE}.b
+    # Don't need original now, after splitting
+    rm ${FILE}
+  fi
+done
+
+# Rename remaining files to .mrc
+for FILE in *.voyager.*.${TODAY}*; do
+  mv ${FILE} ${FILE}.mrc
+  # Count the MARC records in each file
+  marcsplit -c ${FILE}.mrc
+done
+

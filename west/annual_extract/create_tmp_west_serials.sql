@@ -1,3 +1,7 @@
+-- Drop table, if it still exists from before
+drop table vger_report.tmp_west_serials purge;
+
+-- Create working table for later queries/extracts
 create table vger_report.tmp_west_serials as
 with west_mfhds as (
   select record_id as mfhd_id
