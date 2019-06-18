@@ -1,8 +1,5 @@
 #!/bin/sh
 
-echo "2013-05-21: Done with UCLA files; SRLF files so far are .gz and have no location column"
-exit 1
-
 # Get voyager environment, for vars and for cron
 . `echo $HOME | sed "s/$LOGNAME/voyager/"`/.profile.local
 
@@ -21,7 +18,7 @@ if [ ${FILE} = ${BASE} ]; then
 fi
 
 # Unpack the file
-gzcat ${FILE} | tar xvf -
+tar xvzf ${FILE}
 
 # Should be multiple text files with names starting with $BASE
 BIGFILE=${BASE}.all
@@ -29,7 +26,7 @@ cat ${BASE}*.txt > ${BIGFILE}
 
 # If there's anything in BIGFILE, load it into Oracle
 if [ -s ${BIGFILE} ]; then
-  ${VGER_SCRIPT}/vger_sqlldr_load vger_report ${BIGFILE} gbs_candidates.ctl
+  ${VGER_SCRIPT}/vger_sqlldr_load vger_report ${BIGFILE} tmp_gbs_import_2018.ctl
 fi
 
 # Clean up
